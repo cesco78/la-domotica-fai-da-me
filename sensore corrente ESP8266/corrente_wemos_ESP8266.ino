@@ -1,5 +1,5 @@
 /*
- * Questo sketch fa parete del progetto www.ladomoticafaidame.it
+ * Questo sketch fa parte del progetto www.ladomoticafaidame.it
  * Tutte le informazioni relative al progetto o allo schema dei 
  * componenti può essere trovato sul sito.
  * 
