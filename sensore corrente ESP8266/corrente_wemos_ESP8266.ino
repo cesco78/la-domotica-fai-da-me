@@ -29,13 +29,13 @@
 #include "EmonLib.h"
 
 // Queste librerie sono utilizzate per la gestione del display OLED
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <SPI.h> // https://www.arduino.cc/en/Reference/SPI 
+#include <Wire.h> // https://www.arduino.cc/en/Reference/Wire
+#include <Adafruit_GFX.h> // https://github.com/adafruit/Adafruit-GFX-Library
+#include <Adafruit_SSD1306.h> // https://github.com/stblassitude/Adafruit_SSD1306_Wemos_OLED
 
-#include <ESP8266WiFi.h> // libreria per usare la comunicazione WiFi
-#include <PubSubClient.h> // libreria per la comunicazione MQTT
+#include <ESP8266WiFi.h> // libreria per usare la comunicazione WiFi - https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi
+#include <PubSubClient.h> // libreria per la comunicazione MQTT - https://pubsubclient.knolleary.net/
 
 
 // parametri di calibrazione per la pinza amperometrica
