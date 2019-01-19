@@ -14,7 +14,15 @@
  * Il codice è liberamente utilizzabile, modificabile e condivisibile secondo la licenza GPL v3.0
  * E' necessario lasciare questa introduzione all'inizio.
  * 
- * Versione 1.0 del 06/01/2019
+ * Versione 1.1 del 19/01/2019
+ * Aggiunti i timeout sulla connessione WiFi e su quella MQTT
+ * Se vengono superati i tentativi di connessione va in deep sleep
+ * senza trasmettere nulla. Questo serve per non far scaricare la
+ * batteria in caso di fermo della WiFi o del Broker MQTT
+ * Ho anche ridotto il delay dopo la trasmissione MQTT, i 4'' servivano per la GET
+ *
+ * NOTA BENE: prima di metterlo in produzione è necessario togliere tutti i comandi di 
+ * debug che usano la seriale. Meno istruzioni =  meno energia = batteria che dura di più
  */
 
 
@@ -52,19 +60,30 @@ char stringaPayload[64];
 unsigned int raw=0;
 float volt=0.0;
 
+// contatore per decretare l'assenza della connessione
+int tentativi;
+
 void reconnect() {
   // Questo ciclo non termina fino a quando 
   // la connessione MQTT non avviene
+  // o al terzo tentativo
+  tentativi = 0;
   while (!client.connected()) {
     Serial.print("Connessione MQTT in corso...");
 
     // il client ID deve essere univoco nella rete MQTT
-    String clientId = "ESP8266Client-PIPPO";
+    String clientId = "ESP8266Client-Studio";
     
     // Avvia la connessione
     if (client.connect(clientId.c_str())) {
       Serial.println("Connesso!");
     } else {
+      tentativi = tentativi +1;
+      // se è il terzo tentativo, la smette e va in deep sleep
+      if (tentativi == 3)
+      {
+        ESP.deepSleep(1800000000);  // lo sleep è in microsecondi 1.800.000.000 = mezz'ora)
+      }
       Serial.print("Non connesso, errore=");
       Serial.print(client.state());
       Serial.println(" aspetto 5 secondi");
@@ -87,8 +106,15 @@ void setup()
   Serial.begin(9600);
 
   // connessione alla WiFi
+  // se la connesisone alla wifi ci mette troppo vado in deep sleep
+  tentativi = 0;
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) { // fino a che il WiFi non è connesso
+    tentativi = tentativi +1;
+    if (tentativi == 8)
+    {
+      ESP.deepSleep(1800000000);  // lo sleep è in microsecondi 1.800.000.000 = mezz'ora)
+    }
     delay(500);
     Serial.print("."); // disegno un puntino ogni mezzo secondo
     }
@@ -144,9 +170,9 @@ void loop() {
   
   Serial.print("Trasmetto ");
   Serial.println (stringaPayload);
-  client.publish("topicBagno", stringaPayload);
+  client.publish("topicSTANZA", stringaPayload); // il topic è quello che distingue la stanza del sensore
 
-  delay(4000);
+  delay(200); // ho abbassato il tempo, il delay più lungo serviva per la GET http
   Serial.print("sleep mode");
   ESP.deepSleep(1800000000);  // lo sleep è in microsecondi 1.800.000.000 = mezz'ora)
 }
